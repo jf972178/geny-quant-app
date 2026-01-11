@@ -6,7 +6,7 @@ from datetime import datetime
 
 # --- CONFIGURATION (import os
 import streamlit as st
-
+st.cache_data.clear() # Force le bot à oublier samedi pour se concentrer sur dimanche
 # Récupération sécurisée des codes depuis les Secrets Streamlit
 TOKEN_TELEGRAM = st.secrets["MY_BOT_TOKEN"]
 CHAT_ID = st.secrets["MY_CHAT_ID"]
