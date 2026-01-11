@@ -4,7 +4,13 @@ import schedule
 import time
 from datetime import datetime
 
-# --- CONFIGURATION (METS TON TOKEN ICI) ---
+# --- CONFIGURATION (import os
+import streamlit as st
+
+# Récupération sécurisée des codes depuis les Secrets Streamlit
+TOKEN_TELEGRAM = st.secrets["MY_BOT_TOKEN"]
+CHAT_ID = st.secrets["MY_CHAT_ID"]
+) ---
 TOKEN_TELEGRAM = "8271770358:AAFHv4YQFbZKLzXHDSp6Jv_J3HAl8nuyH2w" # <--- Colle ton token entre les guillemets
 CHAT_ID = "6701776187"
 
