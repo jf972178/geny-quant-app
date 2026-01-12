@@ -42,38 +42,21 @@ def job_matinal():
     except Exception as e:
         print(f"Erreur technique : {e}")
 
-# --- INITIALISATION ---if __name__ == "__main__":
-    st.title("📊 Data & Turf : Dashboard")
-    st.write(f"Dernière mise à jour : {datetime.now().strftime('%H:%M:%S')}")
-
-    
-    # Message de confirmation envoyé à ton Telegram
-    envoyer_alerte("🚀 SYSTÈME DATA & TURF ACTIVÉ\nLe bot est en ligne et surveille les courses.") 
-    
-    # Premier lancement immédiat (pour test)
-    job_matinal()
-    
-    # Planification tous les matins à 08h00
-    schedule.every().day.at("08:00").do(job_matinal)
-
-    # Boucle pour maintenir le script actif
-    while True:
-        schedule.run_pending()
-        time.sleep(60)
-    # Message de confirmation au démarrage
-    envoyer_alerte("🚀 SYSTÈME DATA & TURF ACTIVÉ\nLe bot est en ligne et surveille les courses.") 
-    
-    # Premier lancement
-    job_matinal()
-    
-    # Planification
-    schedule.every().day.at("08:00").do(job_matinal)
+# --- INITIALISATION ET SURVEILLANCE ---
 if __name__ == "__main__":
     st.title("📊 Data & Turf : Dashboard")
     st.write(f"Dernière mise à jour : {datetime.now().strftime('%H:%M:%S')}")
     
-    # Premier lancement pour vérifier que tout est OK
+    # 1. Message de confirmation immédiat sur Telegram
+    envoyer_alerte("🚀 SYSTÈME DATA & TURF ACTIVÉ\nLe bot est en ligne et surveille les courses.") 
+    
+    # 2. Lancement du premier scan de la journée (Vérification)
     job_matinal()
     
-    # Planification automatique
+    # 3. Programmation du scan automatique chaque matin
     schedule.every().day.at("08:00").do(job_matinal)
+
+    # 4. Boucle infinie pour maintenir le bot actif sur Streamlit
+    while True:
+        schedule.run_pending()
+        time.sleep(60)
