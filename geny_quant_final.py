@@ -10,7 +10,7 @@ st.cache_data.clear() # Force le bot à oublier samedi pour se concentrer sur di
 # Récupération sécurisée des codes depuis les Secrets Streamlit
 TOKEN_TELEGRAM = st.secrets["MY_BOT_TOKEN"]
 CHAT_ID = st.secrets["MY_CHAT_ID"]
- ---
+# ---
 TOKEN_TELEGRAM = "8271770358:AAFHv4YQFbZKLzXHDSp6Jv_J3HAl8nuyH2w" # <--- Colle ton token entre les guillemets
 CHAT_ID = "6701776187"
 
