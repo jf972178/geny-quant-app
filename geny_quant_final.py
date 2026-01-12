@@ -5,7 +5,7 @@ from datetime import datetime
 import time
 import schedule
 
-# --- CONFIGURATION SÉCURISÉE ---
+# --- CONFIGURATION ---
 TOKEN_TELEGRAM = st.secrets["MY_BOT_TOKEN"]
 CHAT_ID = st.secrets["MY_CHAT_ID"]
 
@@ -15,30 +15,17 @@ def envoyer_alerte(message):
     try:
         httpx.post(url, data=payload)
     except Exception as e:
-        print(f"Erreur envoi : {e}")
+        print(f"Erreur envoi Telegram : {e}")
 
 def job_matinal():
-    st.cache_data.clear() # Correction bug Hidalgo
-    print(f"--- Scan Geny Courses lancé à {datetime.now().strftime('%H:%M')} ---")
+    st.cache_data.clear() 
+    print(f"--- Scan Geny lancé à {datetime.now().strftime('%H:%M')} ---")
     
-    url = "https://www.geny.com/partants-pmu/reunion-pmu-du-jour"
     try:
-        response = httpx.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # Le bot cherche ici les chevaux avec un score > 85
-        # (Logique de filtrage par Driver, Cote et D4 activée)
-        found = False
-        
-        # --- EXEMPLE DE DÉTECTION RÉELLE ---
-        # Si un cheval correspond à tes critères Wizards :
-        # found = True
-        # nom_cheval = "Exemple Pro"
-        # numero = "5"
-        
+        # Simulation de scan pour le test de Lundi
+        found = False 
         if not found:
             print("Aucune cible détectée pour le moment.")
-            
     except Exception as e:
         print(f"Erreur technique : {e}")
 
@@ -47,16 +34,15 @@ if __name__ == "__main__":
     st.title("📊 Data & Turf : Dashboard")
     st.write(f"Dernière mise à jour : {datetime.now().strftime('%H:%M:%S')}")
     
-    # 1. Message de confirmation immédiat sur Telegram
-    envoyer_alerte("🚀 SYSTÈME DATA & TURF ACTIVÉ\nLe bot est en ligne et surveille les courses.") 
+    # 1. Message de confirmation immédiat
+    envoyer_alerte("🚀 SYSTÈME DATA & TURF ACTIVÉ\nLe bot est prêt pour le scan de demain 08h00.") 
     
-    # 2. Lancement du premier scan de la journée (Vérification)
+    # 2. Lancement du premier scan
     job_matinal()
     
-    # 3. Programmation du scan automatique chaque matin
+    # 3. Programmation
     schedule.every().day.at("08:00").do(job_matinal)
 
-    # 4. Boucle infinie pour maintenir le bot actif sur Streamlit
     while True:
         schedule.run_pending()
         time.sleep(60)
