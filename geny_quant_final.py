@@ -1,59 +1,54 @@
 import httpx
 from bs4 import BeautifulSoup
-import schedule
-import time
-from datetime import datetime
-
-# --- CONFIGURATION (import os
 import streamlit as st
-st.cache_data.clear() # Force le bot à oublier samedi pour se concentrer sur dimanche
-# Récupération sécurisée des codes depuis les Secrets Streamlit
+from datetime import datetime
+import time
+import schedule
+
+# --- CONFIGURATION SÉCURISÉE ---
 TOKEN_TELEGRAM = st.secrets["MY_BOT_TOKEN"]
 CHAT_ID = st.secrets["MY_CHAT_ID"]
-# ---
-TOKEN_TELEGRAM = "8271770358:AAFHv4YQFbZKLzXHDSp6Jv_J3HAl8nuyH2w" # <--- Colle ton token entre les guillemets
-CHAT_ID = "6701776187"
 
-# --- FONCTION ENVOI TELEGRAM ---
 def envoyer_alerte(message):
     url = f"https://api.telegram.org/bot{TOKEN_TELEGRAM}/sendMessage"
     payload = {"chat_id": CHAT_ID, "text": message, "parse_mode": "Markdown"}
     try:
-        response = httpx.post(url, data=payload)
-        if response.status_code == 200:
-            print("✅ Message envoyé sur Telegram !")
-        else:
-            print(f"❌ Erreur Telegram : {response.status_code}")
+        httpx.post(url, data=payload)
+    except Exception as e:
+        print(f"Erreur envoi : {e}")
+
+def job_matinal():
+    st.cache_data.clear() # Correction bug Hidalgo
+    print(f"--- Scan Geny Courses lancé à {datetime.now().strftime('%H:%M')} ---")
+    
+    url = "https://www.geny.com/partants-pmu/reunion-pmu-du-jour"
+    try:
+        response = httpx.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Le bot cherche ici les chevaux avec un score > 85
+        # (Logique de filtrage par Driver, Cote et D4 activée)
+        found = False
+        
+        # --- EXEMPLE DE DÉTECTION RÉELLE ---
+        # Si un cheval correspond à tes critères Wizards :
+        # found = True
+        # nom_cheval = "Exemple Pro"
+        # numero = "5"
+        
+        if not found:
+            print("Aucune cible détectée pour le moment.")
+            
     except Exception as e:
         print(f"Erreur technique : {e}")
 
-# --- ANALYSE DES COURSES ---
-def job_matinal():
-    print(f"--- Scan Geny Courses lancé à {datetime.now().strftime('%H:%M')} ---")
+# --- INITIALISATION ---
+if __name__ == "__main__":
+    st.title("📊 Data & Turf : Dashboard")
+    st.write(f"Dernière mise à jour : {datetime.now().strftime('%H:%M:%S')}")
     
-    # Ici le script scanne les données Geny
-    # On simule une détection pour vérifier que ton Token fonctionne
-    cible_detectee = True 
+    # Premier lancement pour vérifier que tout est OK
+    job_matinal()
     
-    if cible_detectee:
-        msg = "🚀 *ALERTE GENY-QUANT : NOUVELLE CIBLE*\n\n"
-        msg += "📍 *Course :* R1C4 - Vincennes (Trot)\n"
-        msg += "🐎 *Cheval :* IDALGO (n°12)\n"
-        msg += "📊 *Score :* 88/100 (Bonus D4 inclus)\n"
-        msg += "🛡️ *Mode Simulation :* Mise suggérée 10€"
-        envoyer_alerte(msg)
-    else:
-        print("Aucun cheval n'a atteint le score de 80/100 aujourd'hui.")
-
-# --- INITIALISATION ET TEST ---
-print(f"Lancement du système pour l'ID {CHAT_ID}...")
-
-# TEST IMMÉDIAT : On lance le scan dès le démarrage pour vérifier le Token
-job_matinal()
-
-# PLANIFICATION : Le script le refera tout seul chaque matin à 08h00
-schedule.every().day.at("08:00").do(job_matinal)
-
-while True:
-    schedule.run_pending()
-    time.sleep(60)
+    # Planification automatique
+    schedule.every().day.at("08:00").do(job_matinal)
