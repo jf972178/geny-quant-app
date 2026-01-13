@@ -18,50 +18,43 @@ def envoyer_alerte(message):
         print(f"Erreur envoi Telegram : {e}")
 
 def job_matinal():
-    st.cache_data.clear() # Nettoyage pour éviter le bug Hidalgo
-    print(f"--- Scan Geny en cours le {datetime.now().strftime('%d/%m à %H:%M')} ---")
+    st.cache_data.clear()
+    print(f"--- Scan Geny lancé le {datetime.now().strftime('%d/%m à %H:%M')} ---")
     
     url = "https://www.geny.com/partants-pmu/reunion-pmu-du-jour"
     try:
-        with httpx.Client(timeout=10.0) as client:
+        with httpx.Client(timeout=15.0) as client:
             response = client.get(url)
             soup = BeautifulSoup(response.text, 'html.parser')
-            
-            # Recherche des chevaux dans la Réunion 1
-            # Ici, le script filtre les chevaux avec un Score > 85
             cibles = []
             
-            # (Logique de calcul simplifiée pour le premier test réel)
-            # Le bot cherche des chevaux "D4" avec un driver de premier plan
-            
-            if not cibles:
-                print("Analyse terminée : Aucun cheval ne remplit les critères de 85/100 aujourd'hui.")
-            else:
-                for cible in cibles:
-                    msg = f"🚀 *ALERTE GENY-QUANT : NOUVELLE CIBLE*\n\n"
-                    msg += f"📍 *Course :* {cible['course']}\n"
-                    msg += f"🐎 *Cheval :* {cible['nom']} (n°{cible['num']})\n"
-                    msg += f"📊 *Score :* {cible['score']}/100\n"
-                    msg += f"🛡️ *Mise suggérée :* 10€"
+            # --- LOGIQUE DE DÉTECTION ---
+            courses = soup.find_all('div', class_='pmu-course')
+            for course in courses:
+                nom_c = course.find('h3').text.strip()
+                partants = course.find_all('tr', class_='partant')
+                for p in partants:
+                    score = 80 # Base de confiance
+                    if "D4" in p.text: score += 10 # Bonus déferrage
+                    
+                    if score >= 85: # Seuil de mise
+                        cibles.append({'c': nom_c, 'n': p.find('td', class_='nom').text.strip(), 's': score})
+
+            if cibles:
+                for cb in cibles:
+                    msg = f"🚀 *CIBLE DÉTECTÉE*\n📍 {cb['c']}\n🐎 {cb['n']}\n📊 Score : {cb['s']}/100\n💰 Mise : 10€"
                     envoyer_alerte(msg)
-
+            else:
+                print("Aucun cheval à 85/100 aujourd'hui.")
     except Exception as e:
-        print(f"Erreur lors du scan : {e}")
+        print(f"Erreur : {e}")
 
-# --- INITIALISATION ET SURVEILLANCE ---
 if __name__ == "__main__":
     st.title("📊 Data & Turf : Dashboard")
-    st.write(f"Dernière mise à jour : {datetime.now().strftime('%H:%M:%S')}")
+    # Message de confirmation au redémarrage
+    envoyer_alerte("✅ SYSTÈME OPÉRATIONNEL\nRéveil configuré toutes les 30min.\nPrêt pour le scan de demain 08h00.")
     
-    # 1. Message de confirmation immédiat
-    envoyer_alerte("🚀 SYSTÈME DATA & TURF ACTIVÉ\nLe bot est prêt pour le scan de demain 08h00.") 
-    
-    # 2. Lancement du premier scan
-    job_matinal()
-    
-    # 3. Programmation
     schedule.every().day.at("08:00").do(job_matinal)
-
     while True:
         schedule.run_pending()
         time.sleep(60)
