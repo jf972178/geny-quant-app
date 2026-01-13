@@ -51,10 +51,12 @@ def job_matinal():
 
 if __name__ == "__main__":
     st.title("📊 Data & Turf : Dashboard")
-    # Message de confirmation au redémarrage
-    envoyer_alerte("✅ SYSTÈME OPÉRATIONNEL\nRéveil configuré toutes les 30min.\nPrêt pour le scan de demain 08h00.")
+    st.write(f"Dernière vérification : {datetime.now().strftime('%H:%M:%S')}")
     
-    schedule.every().day.at("08:00").do(job_matinal)
-    while True:
-        schedule.run_pending()
-        time.sleep(60)
+    # 1. Message de confirmation (uniquement au premier démarrage)
+    # envoyer_alerte("✅ SYSTÈME OPÉRATIONNEL\nPrêt pour le scan de demain 08h00.")
+
+    # 2. LANCEMENT DU SCAN
+    # On lance le scan à chaque fois que l'application est réveillée par Cron-job
+    job_matinal()
+  
