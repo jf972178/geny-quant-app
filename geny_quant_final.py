@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 import streamlit as st
 from datetime import datetime
 
-# --- CONFIGURATION ---
 TOKEN_TELEGRAM = st.secrets["MY_BOT_TOKEN"]
 CHAT_ID = st.secrets["MY_CHAT_ID"]
 
@@ -13,50 +12,30 @@ def envoyer_alerte(message):
     try:
         httpx.post(url, data=payload)
     except Exception as e:
-        print(f"Erreur envoi Telegram : {e}")
+        st.error(f"Erreur Telegram : {e}")
 
 def job_matinal():
     st.cache_data.clear()
-    print(f"--- Scan Geny lancé : {datetime.now().strftime('%d/%m à %H:%M')} ---")
-    
     url = "https://www.geny.com/partants-pmu/reunion-pmu-du-jour"
     try:
         with httpx.Client(timeout=15.0) as client:
-            response = client.get(url)
-            soup = BeautifulSoup(response.text, 'html.parser')
-            cibles = []
-            
+            r = client.get(url)
+            soup = BeautifulSoup(r.text, 'html.parser')
             courses = soup.find_all('div', class_='pmu-course')
-            for course in courses:
-                nom_c = course.find('h3').text.strip()
-                partants = course.find_all('tr', class_='partant')
+            for c in courses:
+                nom_c = c.find('h3').text.strip()
+                partants = c.find_all('tr', class_='partant')
                 for p in partants:
-                    score = 80 
-                    if "D4" in p.text: score += 10 
-                    
-                    if score >= 85:
-                        cibles.append({
-                            'c': nom_c, 
-                            'n': p.find('td', class_='nom').text.strip(), 
-                            's': score
-                        })
-
-            if cibles:
-                for cb in cibles:
-                    msg = f"🚀 *CIBLE DÉTECTÉE*\n📍 {cb['c']}\n🐎 {cb['n']}\n📊 Score : {cb['s']}/100\n💰 Mise : 10€"
-                    envoyer_alerte(msg)
-            else:
-                print("Analyse terminée : Aucun cheval à 85/100 aujourd'hui.")
+                    if "D4" in p.text:
+                        nom_p = p.find('td', class_='nom').text.strip()
+                        envoyer_alerte(f"🚀 *CIBLE*\n📍 {nom_c}\n🐎 {nom_p}\n📊 Score : 90/100")
     except Exception as e:
-        print(f"Erreur technique : {e}")
+        st.error(f"Erreur Scan : {e}")
 
-# --- DÉMARRAGE ---
-if __name__ == "__main__":
-    st.title("📊 Data & Turf : Dashboard")
-    st.write(f"Dernière vérification : {datetime.now().strftime('%H:%M:%S')}")
-    
-    # Message de test immédiat
-    envoyer_alerte("✅ SYSTÈME OPÉRATIONNEL\nConnexion rétablie pour les 490€.")
+st.title("📊 Data & Turf")
+st.write(f"Dernier check : {datetime.now().strftime('%H:%M:%S')}")
 
-    # Lancement du scan
-    job_matinal()
+# On lance le scan immédiatement
+job_matinal()
+# Alerte de test
+envoyer_alerte("✅ LE BOT EST ENFIN RÉVEILLÉ")
