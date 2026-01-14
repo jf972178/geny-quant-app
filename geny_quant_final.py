@@ -33,10 +33,10 @@ def job_matinal():
     except Exception as e:
         st.error(f"Erreur Scan : {e}")
 
-# 2. AFFICHAGE ET EXÉCUTION (Tout est collé à gauche ici)
+# 2. AFFICHAGE ET EXÉCUTION (TOUT COLLÉ À GAUCHE SANS EXCEPTION)
 st.title("📊 Data & Turf")
-st.write(f"Dernière vérification : {datetime.now().strftime('%H:%M:%S')}")
+st.write(f"Vérification : {datetime.now().strftime('%H:%M:%S')}")
 
-# Lancement immédiat
+# Lancement immédiat au démarrage/réveil
 job_matinal()
-envoyer_alerte("✅ LE BOT EST ENFIN OPÉRATIONNEL")
+envoyer_alerte("✅ SYSTÈME ENFIN OPÉRATIONNEL")
