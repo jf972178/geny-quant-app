@@ -54,7 +54,7 @@ if __name__ == "__main__":
     st.write(f"Dernière vérification : {datetime.now().strftime('%H:%M:%S')}")
     
     # 1. Message de confirmation (uniquement au premier démarrage)
-     envoyer_alerte("✅ SYSTÈME OPÉRATIONNEL\nPrêt pour le scan de demain 08h00.")
+    envoyer_alerte("✅ SYSTÈME OPÉRATIONNEL\nPrêt pour le scan de demain 08h00.")
 
     # 2. LANCEMENT DU SCAN
     # On lance le scan à chaque fois que l'application est réveillée par Cron-job
