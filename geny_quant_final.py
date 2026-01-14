@@ -26,16 +26,15 @@ def job_matinal():
             soup = BeautifulSoup(response.text, 'html.parser')
             cibles = []
             
-            # --- LOGIQUE DE DÉTECTION ---
             courses = soup.find_all('div', class_='pmu-course')
             for course in courses:
                 nom_c = course.find('h3').text.strip()
                 partants = course.find_all('tr', class_='partant')
                 for p in partants:
-                    score = 80 # Base de confiance
-                    if "D4" in p.text: score += 10 # Bonus déferrage
+                    score = 80 
+                    if "D4" in p.text: score += 10 
                     
-                    if score >= 85: # Seuil de mise
+                    if score >= 85:
                         cibles.append({
                             'c': nom_c, 
                             'n': p.find('td', class_='nom').text.strip(), 
@@ -51,13 +50,13 @@ def job_matinal():
     except Exception as e:
         print(f"Erreur technique : {e}")
 
-# --- DÉMARRAGE DE L'APPLICATION ---
+# --- DÉMARRAGE ---
 if __name__ == "__main__":
     st.title("📊 Data & Turf : Dashboard")
     st.write(f"Dernière vérification : {datetime.now().strftime('%H:%M:%S')}")
     
-    # Message de test (enlever le # pour vérifier Telegram)
-    # envoyer_alerte("✅ SYSTÈME OPÉRATIONNEL\nBot aligné et prêt.")
+    # Message de test immédiat
+    envoyer_alerte("✅ SYSTÈME OPÉRATIONNEL\nConnexion rétablie pour les 490€.")
 
-    # Exécution automatique du scan à chaque réveil par Cron-job
+    # Lancement du scan
     job_matinal()
