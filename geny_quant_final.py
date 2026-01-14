@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import streamlit as st
 from datetime import datetime
 
+# 1. CONFIGURATION
 TOKEN_TELEGRAM = st.secrets["MY_BOT_TOKEN"]
 CHAT_ID = st.secrets["MY_CHAT_ID"]
 
@@ -32,10 +33,10 @@ def job_matinal():
     except Exception as e:
         st.error(f"Erreur Scan : {e}")
 
+# 2. AFFICHAGE ET EXÉCUTION (Tout est collé à gauche ici)
 st.title("📊 Data & Turf")
-st.write(f"Dernier check : {datetime.now().strftime('%H:%M:%S')}")
+st.write(f"Dernière vérification : {datetime.now().strftime('%H:%M:%S')}")
 
-# On lance le scan immédiatement
+# Lancement immédiat
 job_matinal()
-# Alerte de test
-envoyer_alerte("✅ LE BOT EST ENFIN RÉVEILLÉ")
+envoyer_alerte("✅ LE BOT EST ENFIN OPÉRATIONNEL")
