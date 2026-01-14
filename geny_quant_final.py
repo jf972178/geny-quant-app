@@ -2,8 +2,6 @@ import httpx
 from bs4 import BeautifulSoup
 import streamlit as st
 from datetime import datetime
-import time
-import schedule
 
 # --- CONFIGURATION ---
 TOKEN_TELEGRAM = st.secrets["MY_BOT_TOKEN"]
@@ -19,7 +17,7 @@ def envoyer_alerte(message):
 
 def job_matinal():
     st.cache_data.clear()
-    print(f"--- Scan Geny lancé le {datetime.now().strftime('%d/%m à %H:%M')} ---")
+    print(f"--- Scan Geny lancé : {datetime.now().strftime('%d/%m à %H:%M')} ---")
     
     url = "https://www.geny.com/partants-pmu/reunion-pmu-du-jour"
     try:
@@ -38,25 +36,28 @@ def job_matinal():
                     if "D4" in p.text: score += 10 # Bonus déferrage
                     
                     if score >= 85: # Seuil de mise
-                        cibles.append({'c': nom_c, 'n': p.find('td', class_='nom').text.strip(), 's': score})
+                        cibles.append({
+                            'c': nom_c, 
+                            'n': p.find('td', class_='nom').text.strip(), 
+                            's': score
+                        })
 
             if cibles:
                 for cb in cibles:
                     msg = f"🚀 *CIBLE DÉTECTÉE*\n📍 {cb['c']}\n🐎 {cb['n']}\n📊 Score : {cb['s']}/100\n💰 Mise : 10€"
                     envoyer_alerte(msg)
             else:
-                print("Aucun cheval à 85/100 aujourd'hui.")
+                print("Analyse terminée : Aucun cheval à 85/100 aujourd'hui.")
     except Exception as e:
-        print(f"Erreur : {e}")
+        print(f"Erreur technique : {e}")
 
+# --- DÉMARRAGE DE L'APPLICATION ---
 if __name__ == "__main__":
     st.title("📊 Data & Turf : Dashboard")
     st.write(f"Dernière vérification : {datetime.now().strftime('%H:%M:%S')}")
     
-    # 1. Message de confirmation (uniquement au premier démarrage)
-    envoyer_alerte("✅ SYSTÈME OPÉRATIONNEL\nPrêt pour le scan de demain 08h00.")
+    # Message de test (enlever le # pour vérifier Telegram)
+    # envoyer_alerte("✅ SYSTÈME OPÉRATIONNEL\nBot aligné et prêt.")
 
-    # 2. LANCEMENT DU SCAN
-    # On lance le scan à chaque fois que l'application est réveillée par Cron-job
+    # Exécution automatique du scan à chaque réveil par Cron-job
     job_matinal()
-  
