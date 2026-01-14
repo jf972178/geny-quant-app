@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import streamlit as st
 from datetime import datetime
 
+# 1. IDENTIFIANTS
 TOKEN_TELEGRAM = st.secrets["MY_BOT_TOKEN"]
 CHAT_ID = st.secrets["MY_CHAT_ID"]
 
@@ -32,8 +33,12 @@ def job_matinal():
     except Exception as e:
         st.error(f"Erreur Scan : {e}")
 
-# --- CES LIGNES DOIVENT ÊTRE COLLÉES À GAUCHE ---
-st.title("📊 Data & Turf")
-st.write(f"Dernier check : {datetime.now().strftime('%H:%M:%S')}")
+# 2. EXÉCUTION (TOUT EST COLLÉ À GAUCHE SANS EXCEPTION)
+st.title("📊 Data & Turf : Dashboard")
+st.write(f"Dernier scan : {datetime.now().strftime('%H:%M:%S')}")
+
+# Lancement immédiat au réveil par Cron-job
 job_matinal()
-envoyer_alerte("✅ SYSTÈME OPÉRATIONNEL")
+
+# Message de confirmation
+envoyer_alerte("✅ SYSTÈME OPÉRATIONNEL\nURL et Code validés pour les 490€.")
