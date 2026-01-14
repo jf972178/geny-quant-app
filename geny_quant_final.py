@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup
 import streamlit as st
 from datetime import datetime
 
-# 1. CONFIGURATION
 TOKEN_TELEGRAM = st.secrets["MY_BOT_TOKEN"]
 CHAT_ID = st.secrets["MY_CHAT_ID"]
 
@@ -29,14 +28,12 @@ def job_matinal():
                 for p in partants:
                     if "D4" in p.text:
                         nom_p = p.find('td', class_='nom').text.strip()
-                        envoyer_alerte(f"🚀 *CIBLE*\n📍 {nom_c}\n🐎 {nom_p}\n📊 Score : 90/100")
+                        envoyer_alerte(f"🚀 *CIBLE*\n📍 {nom_c}\n🐎 {nom_p}")
     except Exception as e:
         st.error(f"Erreur Scan : {e}")
 
-# 2. AFFICHAGE ET EXÉCUTION (TOUT COLLÉ À GAUCHE SANS EXCEPTION)
+# --- CES LIGNES DOIVENT ÊTRE COLLÉES À GAUCHE ---
 st.title("📊 Data & Turf")
-st.write(f"Vérification : {datetime.now().strftime('%H:%M:%S')}")
-
-# Lancement immédiat au démarrage/réveil
+st.write(f"Dernier check : {datetime.now().strftime('%H:%M:%S')}")
 job_matinal()
-envoyer_alerte("✅ SYSTÈME ENFIN OPÉRATIONNEL")
+envoyer_alerte("✅ SYSTÈME OPÉRATIONNEL")
